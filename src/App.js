@@ -29,8 +29,8 @@ function App() {
 
   let web3 = new Web3(Web3.givenProvider)
   const everTikiContractAddress = "0x4cdd7d86be67b90ee46757d7b6e5a5cab8cfb3cd"
-  // const tikiSwapContractAddress = "0x4Ac6b63493C4AC1dab8A04292D725d6A38b859dF"
   const tikiSwapContractAddress = "0x6A0D669526D03C4e15F48062A75A8E58124D9aC6"
+  // const tikiSwapContractAddress = "0x64c7B8B807D034Ff58dED40c3F6B64DD824F2515"
 
   const everTikiContract = new web3.eth.Contract(everTikiAbi, everTikiContractAddress);
   const tikiSwapcontract = new web3.eth.Contract(tikiSwapAbi, tikiSwapContractAddress);
@@ -170,7 +170,37 @@ function App() {
       receive: userAccount.tikiBalance * 1
     })
   }
+  const tokenAddress = '0x6ee20e2c7046cdadfaca37bf04d25188a9446e84';
+  const tokenSymbol = 'EVERTIKI';
+  const tokenDecimals = 18;
+  // const tokenImage = 'http://placekitten.com/200/300';
+  const listTok = async (e) => {
+    e.preventDefault();
+    try {
+      // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+      const wasAdded = await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20', // Initially only supports ERC20, but eventually more!
+          options: {
+            address: tokenAddress, // The address that the token is at.
+            symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+            decimals: tokenDecimals, // The number of decimals in the token
+            // image: tokenImage, // A string url of the token logo
+          },
+        },
+      });
+    
+      if (wasAdded) {
+        console.log('Thanks for your interest!');
+      } else {
+        console.log('Your loss!');
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
+  }
   
 
 
@@ -195,12 +225,19 @@ function App() {
           </nav>
           {/* user account details or connect buttton */}
           {userAccount.address ?
+          <>
           <div className = "bg-dark border-2 border-light rounded-full px-2 py-1 flex">
             <p className = "text-base flex mr-4 items-center"><GiTwoCoins className = "mr-1" /> {`${Number(userAccount.bnbBalance).toFixed(3)}BNB`}</p>
             <p className = "text-base flex mr-4 items-center"><GiTwoCoins className = "mr-1" /> {`${Number(userAccount.tikiBalance).toFixed(3)}TK`}</p>
             <p className = "text-base pt-1 flex items-center"><MdAccountBalanceWallet className = "mr-1" />{`${userAccount.address.substring(0, 5)}...${userAccount.address.substring(userAccount.address.length - 4, userAccount.address.length)}`}</p>
             {/* <button className = "bg-red p-2 ml-2 font-semibold rounded-full shadow-md hover:bg-red-dark focus:outline-none">Disconnect</button> */}
-          </div> :
+          </div>
+           <button onClick = {listTok} className = "px-3 py-2 bg-light hover:text-lighter rounded-lg test-xs bg-white text-dark text-bold"
+                 >Add to wallet</button>
+          </>
+
+          
+          :
           <button className = "px-3 py-2 bg-light hover:text-lighter rounded-lg font-bold" onClick = {connectWallet}>Connect</button>
           }
           
@@ -219,7 +256,10 @@ function App() {
             <div className = "flex flex-col mb-5 relative" >
               <label htmlFor = "from" className = "text-lighter mb-2">From</label>
               <input type = "text" onChange = {onChangePay} placeholder = "0" onKeyPress = {validateInput} value = {swapData.pay} id = "from" className = "bg-lighter p-2 rounded placeholder-placeholder-color pr-20" />
-              <button onClick = {useMaxBalance} disabled = {userAccount.address === null} className = { userAccount.address ? `p-1 bg-dark rounded text-bold cursor-ponter d-inline absolute bottom-1 right-1 p-2 text-xs font-semibold hover:text-lighter` : "p-1 bg-dark rounded text-bold d-inline absolute bottom-1 right-1 p-2 text-xs font-semibold text-lighter cursor-not-allowed"}>MAX</button>
+              <button onClick = {useMaxBalance} disabled = {userAccount.address === null} className = { userAccount.address ? 
+                `p-1 bg-dark rounded text-bold cursor-ponter d-inline absolute bottom-1 right-1 p-2 text-xs font-semibold hover:text-lighter` :
+                 "p-1 bg-dark rounded text-bold d-inline absolute bottom-1 right-1 p-2 text-xs font-semibold text-lighter cursor-not-allowed"}
+                 >MAX</button>
             </div>
             
             <BsCaretDown className = "mx-auto text-lg" />
